@@ -1,12 +1,16 @@
----
-- name: Network Validation
-  hosts: host1
-  tasks:
-    - name: Inter-Subnet Ping Test (Host 1 to Host 3)
-      shell: ping -c 4 -w 5 192.168.10.34
-      register: ping_result
 
-    - name: Success Message
-      debug:
-          msg: "VALIDACION EXITOSA: Comunicacion entre subredes establecida a traves del Router"
-      when: ping_result.rc == 0
+---
+- name: Configure Routing and Gateways
+  hosts: all
+  tasks:
+    - name: Enable IP Forwarding on Router (Scenario 02)
+      shell: echo 1 > /proc/sys/net/ipv4/ip_forward
+      when: inventory_hostname == 'router1'
+
+    - name: Set Default Gateway for LAN 1
+      shell: ip route add default via 192.168.10.1 || true
+      when: inventory_hostname in ['host1', 'host2']
+
+    - name: Set Default Gateway for LAN 2
+      shell: ip route add default via 192.168.10.33 || true
+      when: inventory_hostname in ['host3', 'host4']
