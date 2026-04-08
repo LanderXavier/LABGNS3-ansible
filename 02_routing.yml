@@ -1,0 +1,12 @@
+---
+- name: Network Validation
+  hosts: host1
+  tasks:
+    - name: Inter-Subnet Ping Test (Host 1 to Host 3)
+      shell: ping -c 4 -w 5 192.168.10.34
+      register: ping_result
+
+    - name: Success Message
+      debug:
+          msg: "VALIDACION EXITOSA: Comunicacion entre subredes establecida a traves del Router"
+      when: ping_result.rc == 0
